@@ -1,112 +1,134 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity
+} from 'react-native';
 
-export default function TabTwoScreen() {
+type Recipe = {
+  id: number;
+  title: string;
+  image: string;
+};
+
+const SPOONACULAR_API_KEY = 'd2efffac1178446ebe72e8612849d70d';
+const SPOONACULAR_ENDPOINT = 'https://api.spoonacular.com/recipes/complexSearch';
+
+export default function RecipesScreen() {
+  const [search, setSearch] = useState('');
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchRecipes = async (query: string) => {
+    if (!query.trim() && query !== '') return; // skip empty search
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(SPOONACULAR_ENDPOINT, {
+        params: {
+          apiKey: SPOONACULAR_API_KEY,
+          query,
+          number: 20,
+        },
+      });
+
+      setRecipes(response.data.results || []);
+    } catch (err: any) {
+      console.error('Error fetching recipes:', err.response || err.message);
+      setError('Failed to load recipes. Please try again.');
+      setRecipes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch some initial recipes
+  useEffect(() => {
+    fetchRecipes('pasta'); // initial example search
+  }, []);
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchRecipes(search);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const renderRecipe = ({ item }: { item: Recipe }) => (
+    <TouchableOpacity style={styles.recipeCard}>
+      <Image source={{ uri: item.image }} style={styles.recipeImage} />
+      <ThemedText type="subtitle" style={{ marginTop: 8 }}>
+        {item.title}
+      </ThemedText>
+    </TouchableOpacity>
+  );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
+    <ThemedView style={styles.container}>
+      <TextInput
+        placeholder="Search recipes..."
+        value={search}
+        onChangeText={setSearch}
+        style={styles.searchBox}
+      />
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#1D3D47" style={{ marginTop: 20 }} />
+      ) : error ? (
+        <ThemedText style={{ textAlign: 'center', marginTop: 20 }}>{error}</ThemedText>
+      ) : (
+        <FlatList
+          data={recipes}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.listContainer}
+          renderItem={renderRecipe}
+          ListEmptyComponent={
+            <ThemedText style={{ textAlign: 'center', marginTop: 20 }}>
+              No recipes found.
             </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+          }
+        />
+      )}
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    padding: 16,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  searchBox: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  listContainer: {
+    paddingBottom: 16,
+  },
+  recipeCard: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    backgroundColor: '#fff',
+  },
+  recipeImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 12,
   },
 });

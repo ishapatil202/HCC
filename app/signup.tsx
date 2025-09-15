@@ -3,15 +3,19 @@ import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 import { StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 
-export default function HomeScreen() {
+export default function SignUpScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={styles.title}>
-        Welcome to ChefMate 🍴
+        Create an Account ✨
       </ThemedText>
 
-      {/* Login Form */}
+      {/* Signup Form */}
       <ThemedView style={styles.form}>
+        <TextInput
+          style={styles.input}
+          placeholder="Full Name"
+        />
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -23,18 +27,23 @@ export default function HomeScreen() {
           placeholder="Password"
           secureTextEntry
         />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          secureTextEntry
+        />
 
         <TouchableOpacity style={styles.button}>
           <ThemedText type="defaultSemiBold" style={styles.buttonText}>
-            Log In
+            Sign Up
           </ThemedText>
         </TouchableOpacity>
 
-        {/* Navigate to Sign Up page */}
-        <Link href="/signup" asChild>
+        {/* Back to Login */}
+        <Link href="/" asChild>
           <TouchableOpacity>
             <ThemedText style={styles.linkText}>
-              Don’t have an account? Sign Up
+              Already have an account? Log In
             </ThemedText>
           </TouchableOpacity>
         </Link>
