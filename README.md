@@ -1,4 +1,4 @@
-# Welcome to your Expo app 👋
+# Welcome to ChefMate
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
@@ -47,4 +47,23 @@ To learn more about developing your project with Expo, look at the following res
 Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+
+
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+
+
+*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+
+Make sure you have node/npm installed and working
+node -v
+npm -v
+	If not, then install.
+
+Install expo-cli
+npm install --global expo-cli
+
+To run the app, run the following
+npm install
+npx expo start
