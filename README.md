@@ -56,14 +56,24 @@ Join our community of developers creating universal apps.
 *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 
 
-Make sure you have node/npm installed and working
-node -v
-npm -v
-	If not, then install.
+1. Make sure you have node/npm installed and working
 
-Install expo-cli
+node -v
+
+npm -v
+
+If not, then install.
+
+
+
+2. Install expo-cli
+
 npm install --global expo-cli
 
-To run the app, run the following
+
+
+3. To run the app, run the following
+
 npm install
+
 npx expo start
